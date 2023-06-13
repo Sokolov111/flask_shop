@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{{ super() }}
+
+<ul class="container header">
+    <li class="header_link"><a href="/create_post">Добавить пост</a></li>
+    <form action="delete_user" method="POST">
+        <input type="number" placeholder="ID пользователя" name="user_id">
+        <li class="header_link"><input type="submit" placeholder="Удалить пользователя"></li>
+    </form>
+
+    <li class="header_link"><a href="/admin/admin">Панель</a></li>
+</ul>
+
+{% endblock %}

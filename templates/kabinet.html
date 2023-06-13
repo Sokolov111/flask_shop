@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{{ super() }}
+
+<h1>{{ current_user.get_phone() }}</h1>
+<p>Привет {{ current_user.get_name() }} !</p>
+<a href="/logout">выйти</a>
+{% endblock %}

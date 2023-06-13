@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{{ super() }}
+
+<form action="/registration" method="post" class="shop_form">
+    <label>Логин: <input name="login" type="text"></label>
+    <label>Номер телефона: <input name="telephone" type="text"></label>
+    <label>Пароль: <input name="psw" type="password"></label>
+    <label>Повторите пароль: <input name="rep_psw" type="password"></label>
+    <label ><input class="send_butt" type="submit" placeholder="Отправить"></label>
+
+    {% for kat, msg in get_flashed_messages(True) %}
+        <div class="flash_message {{kat}}">
+            {{ msg }}
+        </div>
+    {% endfor %}
+</form>
+
+
+{% endblock %}

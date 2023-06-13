@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{{ super() }}
+
+
+
+<form action="/login" method="POST" class="shop_form">
+    <label> Логин: <input type="text" name="login"></label>
+    <label> Пароль: <input type="password" name="pwd"></label>
+    <label><input type="submit" placeholder="Отправить" class="send_butt"></label>
+    <label><input type="checkbox" name ="remainme"></label>
+    <label>Нет аккаунта? <a href="/registration">Зарегистрироваться!</a></label>
+
+    <!-- Вывод быстрых сообщений -->
+    {% for kat, msg in get_flashed_messages(True) %}
+        <div class="flash_message {{kat}}">
+            {{ msg }}
+        </div>
+    {% endfor %}
+</form>
+
+
+
+{% endblock %}

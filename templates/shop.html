@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{{ super() }}
+
+<!--Блок меню магазина-->
+{% block shopmenu %}
+    <ul class="container header">
+        {% for sm in shop_menu %}
+            <li class="header_link"><a href="{{ url_for('category_post',table_n=sm.table_n) }}">{{sm.title}}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block products %}
+    <section class="container prod_section">
+        {% for prod in products %}
+            <div class="prod_card">
+                <a href="{{ url_for('show_post',id_post=prod.id)}}">{{ prod.name }}</a>
+                <img src="../static/imgs/{{prod.product_photo}}" alt="product">
+                <p>Отзыв</p>
+                <p class="prod_price">Цена: {{ prod.price }}</p>
+                <a href="#">В корзину</a>
+            </div>
+        {% endfor %}
+
+    </section>
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{{ super() }}
+
+<form action="/create_post" method="POST" class="shop_form">
+    <label>Добавить товар</label>
+    <label>Название товара: <input type="text" name="name"></label>
+    <label>Цена:<input type="text" name="price"></label>
+    <label>Описание товара: <input type="text" name="descript"></label>
+    <select name="table_n">
+        <option>laptops</option>
+        <option>watches</option>
+        <option>for_gamers</option>
+        <option>phones</option>
+    </select>
+<!--    <p><label>Название таблицы:<input type="text" name="table_n"></label></p>-->
+    <label>Фото товара: <input type="text" name="pord_photo"></label>
+    <label><input type="submit" placeholder="Отправить" class="send_butt"></label>
+</form>
+
+
+{% endblock %}

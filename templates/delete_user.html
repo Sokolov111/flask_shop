@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{{ super() }}
+{% block users %}
+    {% for i in users %}
+        <p>1</p>
+        <p>{{i[1]}}</p>
+        <p>{{i.name}}</p>
+    {% endfor %}
+{% endblock %}
+{% endblock %}
