@@ -11,7 +11,20 @@
         <li class="header_link"><input type="submit" placeholder="Удалить пользователя"></li>
     </form>
 
-    <li class="header_link"><a href="/admin/admin">Панель</a></li>
+    <li class="header_link"><a href="/admin">Панель</a></li>
 </ul>
+
+<div class="container">
+    <p>Удалить пост:</p>
+    {% for posts in admin_posts %}
+        <p>{{ posts.name }}</p>
+        <a href="{{ url_for('delete_post',post_id = posts.id) }}">Удалить пост</a>
+    {% endfor %}
+    {% for kat, msg in get_flashed_messages(True) %}
+        <div class="flash_message {{kat}}">
+            {{ msg }}
+        </div>
+    {% endfor %}
+</div>
 
 {% endblock %}

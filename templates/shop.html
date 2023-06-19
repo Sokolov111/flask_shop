@@ -7,6 +7,7 @@
 <!--Блок меню магазина-->
 {% block shopmenu %}
     <ul class="container header">
+        <li class="header_link"><a href="/shop">Все</a></li>
         {% for sm in shop_menu %}
             <li class="header_link"><a href="{{ url_for('category_post',table_n=sm.table_n) }}">{{sm.title}}</a></li>
         {% endfor %}

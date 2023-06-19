@@ -25,5 +25,6 @@ CREATE TABLE IF NOT EXISTS users (
     id integer PRIMARY KEY AUTOINCREMENT,
     login text NOT NULL,
     password text NOT NULL,
-    phone text NOT NULL
+    phone text NOT NULL,
+    avatar BLOB DEFAULT NULL
 );

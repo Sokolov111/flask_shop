@@ -4,21 +4,27 @@ from FDataBase import FDataBase
 from werkzeug.security import generate_password_hash , check_password_hash
 from flask_login import LoginManager , login_user , login_required ,logout_user , current_user
 from UserLogin import UserLogin
-
+from flask_sqlalchemy import SQLAlchemy
 
 app = fl.Flask(__name__)
 app.config["SECRET_KEY"] = "ASGKASJFQ3323AKFSFK32FKAF"
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shopData.db'
 login_manager = LoginManager(app)
 login_manager.login_message = "Авторизуйтесь для доступа к странице"
 login_manager.login_message_category = "success"
 login_manager.login_view = 'login'
 
-menu = [{"url":"/",'name':'Главная'},
-        {"url":"/posts",'name':'Посты'},
-        {"url":"/about",'name':'О нас'},
-        {"url":"/login",'name':'Кабинет'}]
+db = SQLAlchemy(app)
 
+class Users(db.model):
+    id = db.Column(db.Integer , primary_key = True)
+    login = db.Column(db.String(50) , unique = True)
+    password = db.Column(db.integer(500),nullable = True)
+
+    def __repr__(self):
+        return f"<users {self.id}>"
+
+class 
 
 # Функция для получения данных из БД
 dbase = None
@@ -39,6 +45,38 @@ def index():
 
     return fl.render_template("index.html",menu = dbase.get_menu(), title= "Главная")
 
+# Вкладка магазин
+@app.route("/shop")
+@login_required
+def shop_page():
+    return fl.render_template('shop.html',menu = dbase.get_menu(), shop_menu = dbase.get_shop_menu(),products = dbase.get_all_products(), title= "Магазин")
+
+# Вывод постов
+@app.route('/post/<int:id_post>')
+def show_post(id_post):
+    if 'userLogged' in fl.session:
+        user_name = fl.session['userLogged']
+    else:
+        user_name = "None"
+
+    obj = dbase.get_post(id_post)
+
+    if not obj:
+        fl.abort(404)
+
+    return fl.render_template('post.html',menu=dbase.get_menu() , name = obj , user = user_name )
+
+# Вкладка постов под категориями
+@app.route("/shop/<table_n>")
+def category_post(table_n):
+    name = dbase.get_categ_products(table_n)
+    return fl.render_template('phones.html',menu=dbase.get_menu(), shop_menu = dbase.get_shop_menu(),title='Телефоны',name = name )
+
+@login_manager.user_loader
+def load_user(user_id):
+    print("Load user")
+    return UserLogin().fromDB(user_id,dbase)
+
 # Регистрация
 @app.route('/registration', methods=["GET","POST"])
 def registration():
@@ -50,8 +88,6 @@ def registration():
                 fl.flash("Пользователь с таким логином уже есть !",category='error')
                 user_in_base = False
                 break
-            else:
-                print("else")
 
         if user_in_base:
             if len(fl.request.form['psw']) < 9 or fl.request.form['psw'] != fl.request.form['rep_psw']:
@@ -66,25 +102,17 @@ def registration():
                     fl.flash("Успешно! ",category = 'success')
                     return fl.redirect(fl.url_for('login'))
 
-    # return fl.render_template('add_post.html',menu = dbase.get_menu())
-
     return fl.render_template('/registration.html' , menu=dbase.get_menu())
 
-@login_manager.user_loader
-def load_user(user_id):
-    print("Load user")
-    return UserLogin().fromDB(user_id,dbase)
-
-
-# Логинизация ( доделать )
+# Логинизация
 @app.route('/login',methods = ["POST","GET"])
 def login():
     if current_user.is_authenticated:
         return fl.redirect(fl.url_for('kabinet'))
 
     if fl.request.method == "POST":
-        user = dbase.get_user(fl.request.form['login'])
-        if user:
+        user = dbase.get_users_by_login(fl.request.form['login'])
+        if user and check_password_hash(user['password'], fl.request.form['pwd']):
             userLogin = UserLogin().create(user)
             rm = True if fl.request.form.get('remainme') else False
             login_user(userLogin,remember=rm)
@@ -130,75 +158,35 @@ def login():
 
 # Админ панель
 @app.route('/admin')
+@login_required
 def admin():
     # Проверка на неправильный путь до пользователя
     # if "userLogged" not in fl.session or fl.session["userLogged"] != username:
     #     fl.abort(401)
 
+    admin_posts = dbase.get_all_products()
     admin_menu =  dbase.get_menu()
-    return fl.render_template('admin_panel.html',menu =admin_menu,title='Личный кабинет')
+    return fl.render_template('admin_panel.html',menu =admin_menu,title='Личный кабинет',admin_posts = admin_posts)
 
-
-# ЛК ( доделать )
-@app.route('/kabinet')
-@login_required
-def kabinet():
-    # Проверка на неправильный путь до пользователя
-    # if "userLogged" not in fl.session or fl.session["userLogged"] != username:
-    #     fl.abort(401)
-
-    return fl.render_template('kabinet.html',menu = dbase.get_menu(),title='Личный кабинет' )
-
-# Выход из ЛК
-@app.route('/logout')
-def logout():
-    logout_user()
-    fl.flash('Вы вышли из аккаунта','success')
-
-    return fl.redirect(fl.url_for('login'))
-
-# Для примера - вывод постов
-@app.route('/post/<int:id_post>')
-def show_post(id_post):
-    if 'userLogged' in fl.session:
-        user_name = fl.session['userLogged']
-    else:
-        user_name = "None"
-
-    obj = dbase.get_post(id_post)
-
-    if not obj:
-        fl.abort(404)
-
-    return fl.render_template('post.html',menu=dbase.get_menu() , name = obj , user = user_name )
-
-# Вкладка магазин
-
-@app.route("/shop")
-@login_required
-def shop_page():
-
-    return fl.render_template('shop.html',menu = dbase.get_menu(), shop_menu = dbase.get_shop_menu(),products = dbase.get_all_products(), title= "Магазин")
-
-# Вкладка постов под категориями
-@app.route("/shop/<table_n>")
-def category_post(table_n):
-    name = dbase.get_categ_products(table_n)
-    return fl.render_template('phones.html',menu=dbase.get_menu(), shop_menu = dbase.get_shop_menu(),title='Телефоны',name = name )
 
 # Удаление поста через админ панель
 @app.route('/delete_post/<int:post_id>')
 def delete_post(post_id):
-    Dbase = dbase.delete_post(post_id)
+    print(post_id)
+    res = dbase.delete_post(post_id)
+    if res:
+        fl.flash("Успешно !",category='success')
+    else:
+        fl.flash("Ошибка",category='error')
     return fl.render_template('index.html',menu=dbase.get_menu(),title = "Главная")
 
 # Удалить пользоваетя
 @app.route('/delete_user', methods = ["GET","POST"])
 def delete_user():
-
-    id_ = fl.request.form.get('user_id')
+    # ошибка - TypeError: delete_user() missing 1 required positional argument: 'self'
+    user_id = fl.request.form.get('user_id')
     print(id)
-    del_user = FDataBase.delete_user(id_)
+    del_user = FDataBase.delete_user(user_id = user_id)
     if not del_user:
         fl.flash("Ошибка добавления статьи",category = "error")
     else:
@@ -206,8 +194,7 @@ def delete_user():
         return fl.redirect(fl.url_for('admin_panel'))
     return fl.render_template('admin_panel.html',menu=dbase.get_menu(),title = "Админ панель")
 
-
-
+# Добавить пост
 @app.route('/create_post',methods = ["POST","GET"])
 def create_post():
     if fl.request.method == "POST":
@@ -220,17 +207,60 @@ def create_post():
 
     return fl.render_template('create_post.html')
 
+# ЛК
+@app.route('/kabinet')
+@login_required
+def kabinet():
+    # Проверка на неправильный путь до пользователя
+    # if "userLogged" not in fl.session or fl.session["userLogged"] != username:
+    #     fl.abort(401)
+
+    return fl.render_template('kabinet.html',menu = dbase.get_menu(),title='Личный кабинет',user_id = current_user.get_id())
+
+# Получить аватарку в ЛК
+@app.route('/userava')
+@login_required
+def userava():
+    img = current_user.get_avatar(app)
+    if not img:
+        return ''
+
+    h = fl.make_response(img)
+    h.headers['Content-Type'] = 'image/png'
+    return h
+
+# Обновить аватарку
+@app.route('/upload',methods = ['POST',"GET"])
+@login_required
+def upload():
+    if fl.request.method == "POST":
+        file = fl.request.files['file']
+        if file and current_user.verifyExt(file.filename):
+            try:
+                img = file.read()
+                res = dbase.updateUserAvatar(img,current_user.get_id())
+                if not res:
+                    fl.flash("Ошибка обновления аватарки","error")
+                    return fl.redirect(fl.url_for('kabinet'))
+                fl.flash("Аватар овновлен", "success")
+            except FileNotFoundError as e:
+                fl.flash("Ошибка чтения файла" , 'error')
+        else:
+            fl.flash("Ошибка обновления аватара","error")
+    return fl.redirect(fl.url_for('kabinet'))
+
+# Выход из ЛК
+@app.route('/logout')
+def logout():
+    logout_user()
+    fl.flash('Вы вышли из аккаунта','success')
+
+    return fl.redirect(fl.url_for('login'))
+
 # ошибка при неправильном переходе
 @app.errorhandler(404)
 def not_found(error):
-    return fl.render_template("not_found.html",menu=menu,title="Страница не найдена!")
-
-# 14 логин - регистрация
-
-
-
-
-
+    return fl.render_template("not_found.html",menu=dbase.get_menu(),title="Страница не найдена!")
 
 #  Разрыв соединения с БД
 @app.teardown_appcontext
@@ -238,8 +268,5 @@ def close_db(error):
     if hasattr(fl.g,'link_db'):
         fl.g.link_db.close()
 
-
 if __name__ == "__main__":
     app.run(debug=True)
-
-# 15 - нужно сделать , доступ юзеров к постам

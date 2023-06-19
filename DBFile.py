@@ -5,6 +5,7 @@ import os
 DATABASE = '/tmp/shopData.db'
 DEBUG = True
 SECRET_KEY = 'ADKdafkq301g2kvka;kf023'
+MAX_CONTENT_LENGTH = 1024 * 1024
 
 app = fl.Flask(__name__)
 app.config.from_object(__name__)

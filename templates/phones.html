@@ -5,19 +5,20 @@
 {{ super() }}
 {% block shopmenu %}
     <ul class="container header">
+        <li class="header_link"><a href="/shop">Все</a></li>
         {% for sm in shop_menu %}
             <li class="header_link"><a href="{{ url_for('category_post',table_n=sm.table_n) }}">{{sm.title}}</a></li>
         {% endfor %}
     </ul>
 {% endblock %}
-<h1>Категория телефоны </h1>
 
+ <h1 style="color:#fff" class="prod_section">Категория {{ name[0].table_n }} </h1>
  <section class="container prod_section">
-<p>Hello World!</p>
+
      {% for obj in name %}
         <div class="prod_card">
             <a href="{{ url_for('show_post',id_post=obj.id) }}">{{ obj.name }}</a>
-            <img src="" alt="product">
+            <img src="../static/imgs/{{ obj.product_photo }}" alt="product">
             <p>Отзыв</p>
             <p class="prod_price">Цена: {{ obj.price }}</p>
             <a href="#">В корзину</a>

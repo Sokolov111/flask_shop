@@ -27,7 +27,6 @@ class FDataBase:
             print("Ошибка чтения БД")
         return ['no']
 
-    # Товары в магазин ( доделать )
     def get_all_products(self):
         sql = '''SELECT * FROM products'''
         try:
@@ -73,13 +72,13 @@ class FDataBase:
             return False
         return True
 
-    def delete_user(self,id):
-        sql = f"DELETE FROM users WHERE id = {id}"
+    def delete_user(self , user_id):
+        sql = f"DELETE FROM users WHERE id = {user_id}"
         try:
             self.__cur.execute(sql)
             self.__db.commit()
         except sqlite3.Error as e:
-            print('ошибка удаления пользоваетля '+str(e))
+            print('ошибка удаления пользоваетля '+ str(e))
             return False
         return True
 
@@ -96,7 +95,7 @@ class FDataBase:
     # Доавбление пользователя в БД
     def add_user(self,login,phone,psw):
         try:
-            self.__cur.execute(" INSERT INTO users VALUES (NULL,?,?,?)",(login,phone,psw))
+            self.__cur.execute(" INSERT INTO users VALUES (NULL,?,?,?,NULL)",(login,phone,psw))
             self.__db.commit()
         except sqlite3.Error as e:
             print('ошбка добавления статьи '+str(e))
@@ -113,19 +112,44 @@ class FDataBase:
                 # print("Users", res[0]['login'])
                 return res
         except sqlite3.Error as e:
-            print("Error " +str(e))
+            print("Error " + str(e))
         return (False,False)
 
-    def get_user(self,login):
+    def get_users_by_login(self,login):
         try:
-            self.__cur.execute(f"SELECT * FROM users WHERE login = '{login}' LIMIT 1")
+            self.__cur.execute(f"SELECT * FROM users WHERE login = '{login}'")
+            res = self.__cur.fetchone()
+            if not res:
+                print("Ошибка получения пользователей")
+                return False
+            return res
+        except sqlite3.Error as e:
+            print("Ошибка получени данных по пользователям из БД " +str(e))
+        return False
+
+    def get_user(self,user_id):
+        try:
+            self.__cur.execute(f"SELECT * FROM users WHERE id = '{user_id}' LIMIT 1")
             res = self.__cur.fetchone()
             if not res:
                 print("Пользователь не найден" , res)
                 return False
             return res
         except sqlite3.Error as e:
-            print("Ошибка получени данных из БД " +str(e))
+            print("Ошибка получения данных из БД " + str(e))
         return False
 
-#10- 13:40 - фото
+    # Обновление фото пользователя в БД
+    def updateUserAvatar(self,avatar,user_id):
+        if not avatar:
+            return False
+
+        try:
+            binary = sqlite3.Binary(avatar)
+            self.__cur.execute(f"UPDATE users SET avatar = ? WHERE id = ?",(binary,user_id))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка обновления данных в БД " + str(e))
+            return False
+
+        return True
