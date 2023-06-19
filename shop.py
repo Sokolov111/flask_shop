@@ -4,27 +4,14 @@ from FDataBase import FDataBase
 from werkzeug.security import generate_password_hash , check_password_hash
 from flask_login import LoginManager , login_user , login_required ,logout_user , current_user
 from UserLogin import UserLogin
-from flask_sqlalchemy import SQLAlchemy
 
 app = fl.Flask(__name__)
 app.config["SECRET_KEY"] = "ASGKASJFQ3323AKFSFK32FKAF"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shopData.db'
 login_manager = LoginManager(app)
 login_manager.login_message = "Авторизуйтесь для доступа к странице"
 login_manager.login_message_category = "success"
 login_manager.login_view = 'login'
 
-db = SQLAlchemy(app)
-
-class Users(db.model):
-    id = db.Column(db.Integer , primary_key = True)
-    login = db.Column(db.String(50) , unique = True)
-    password = db.Column(db.integer(500),nullable = True)
-
-    def __repr__(self):
-        return f"<users {self.id}>"
-
-class 
 
 # Функция для получения данных из БД
 dbase = None
