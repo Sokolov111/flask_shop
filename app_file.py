@@ -9,7 +9,6 @@ app.config["SQLALCHEMY_RECORD_QUERIES"] = True
 
 db = SQLAlchemy(app)
 
-
 class Mainmenu(db.Model):
     id = db.Column(db.Integer , primary_key = True)
     title = db.Column(db.String(50),nullable = True)
@@ -50,7 +49,7 @@ class Users(db.Model):
         return f"<users {self.id}>"
 
 # Создать БД
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     with app.app_context():
+#         db.create_all()
+#     app.run(debug=True)

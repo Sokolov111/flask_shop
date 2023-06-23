@@ -1,4 +1,4 @@
-import math , time , sqlite3
+import sqlite3
 import app_file
 
 class FDataBase:
@@ -107,62 +107,6 @@ class FDataBase:
         #     return False
         # return True
 
-    # Удаление статьи через админ панель
-    def delete_post(self,post_id):
-        try:
-            with app_file.app.app_context():
-                from sqlalchemy import delete
-                delete_stmt = (
-                    delete(app_file.Users)
-                    .where(app_file.Users.id == post_id)
-                )
-                # if delete_stmt:
-                #     print("Успешно")
-                # else:
-                #     print("Неуспешно")
-                # delete(app_file.Users).where(app_file.Users == post_id)
-
-                # app_file.Users.query(app_file.Users).filter_by(id = post_id).delete(synchronize_session = 'fetch')
-
-                app_file.db.session.commit()
-
-        except sqlite3.Error as e:
-            print("Ошибка удаления поста " ,e)
-            app_file.db.session.rollback()
-            return False
-        return True
-
-        # sql = f""" DELETE FROM products WHERE id = {post_id} """
-        # try:
-        #     self.__cur.execute(sql)
-        #     self.__db.commit()
-        # except sqlite3.Error as e:
-        #     print('ошибка удаления статьи '+str(e))
-        #     return False
-        # return True
-
-    def delete_user(self , user_id):
-        try:
-            with app_file.app.app_context():
-                from sqlalchemy import delete
-                delete(app_file.Users).where(app_file.Users == user_id)
-                # user = app_file.Users.query.get(user_id)
-                # app_file.db.session.delete(user)
-                app_file.db.session.commit()
-        except sqlite3.Error as e:
-            print("Ошибка удаления пользователя ",e)
-            app_file.db.session.rollback()
-            return False
-        return True
-
-        # sql = f"DELETE FROM users WHERE id = {user_id}"
-        # try:
-        #     self.__cur.execute(sql)
-        #     self.__db.commit()
-        # except sqlite3.Error as e:
-        #     print('ошибка удаления пользоваетля '+ str(e))
-        #     return False
-        # return True
 
     # Открыть пост
     def get_post(self,post_id):
@@ -181,9 +125,6 @@ class FDataBase:
         # except sqlite3.Error as e:
         #     print("Error" +str(e))
         # return False
-
-    # Доавбление пользователя в БД
-
 
     # Получение пользователей из БД
     def get_users(self,login):
@@ -277,4 +218,62 @@ class FDataBase:
         #     print("Ошибка обновления данных в БД " + str(e))
         #     return False
 
+        # return True
+
+    # ---------- ошибка -----
+    # Удаление статьи через админ панель
+    def delete_post(self,post_id):
+        try:
+            with app_file.app.app_context():
+                from sqlalchemy import delete
+                delete_stmt = (
+                    delete(app_file.Users)
+                    .where(app_file.Users.id == post_id)
+                )
+                # if delete_stmt:
+                #     print("Успешно")
+                # else:
+                #     print("Неуспешно")
+                # delete(app_file.Users).where(app_file.Users == post_id)
+
+                # app_file.Users.query(app_file.Users).filter_by(id = post_id).delete(synchronize_session = 'fetch')
+
+                app_file.db.session.commit()
+
+        except sqlite3.Error as e:
+            print("Ошибка удаления поста " ,e)
+            app_file.db.session.rollback()
+            return False
+        return True
+
+        # sql = f""" DELETE FROM products WHERE id = {post_id} """
+        # try:
+        #     self.__cur.execute(sql)
+        #     self.__db.commit()
+        # except sqlite3.Error as e:
+        #     print('ошибка удаления статьи '+str(e))
+        #     return False
+        # return True
+
+    def delete_user(self , user_id):
+        try:
+            with app_file.app.app_context():
+                from sqlalchemy import delete
+                delete(app_file.Users).where(app_file.Users == user_id)
+                # user = app_file.Users.query.get(user_id)
+                # app_file.db.session.delete(user)
+                app_file.db.session.commit()
+        except sqlite3.Error as e:
+            print("Ошибка удаления пользователя ",e)
+            app_file.db.session.rollback()
+            return False
+        return True
+
+        # sql = f"DELETE FROM users WHERE id = {user_id}"
+        # try:
+        #     self.__cur.execute(sql)
+        #     self.__db.commit()
+        # except sqlite3.Error as e:
+        #     print('ошибка удаления пользоваетля '+ str(e))
+        #     return False
         # return True

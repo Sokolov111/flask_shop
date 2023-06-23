@@ -16,7 +16,6 @@ login_manager.login_message_category = "success"
 login_manager.login_view = 'login'
 
 
-
 # Функция для получения данных из БД
 dbase = None
 @app.before_request

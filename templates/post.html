@@ -6,11 +6,17 @@
 {% if user == "admin" %}
     <a href="{{ url_for('delete_post',post_id = name[0].id) }}">Удалить пост</a>
 {% endif %}
-<p>{{name[0].name}}</p>
-<img width="250" src="../static/imgs/{{name[0].product_photo}}" alt="photo">
-<br>
-<p>{{ name[0].descript|safe }}</p>
-<br>
-<p>{{ name[0].price }}</p>
+<div class="post_contain">
+    <div class="post_contain_photo">
+        <h1>{{name[0].name}}</h1>
+        <img width="250" src="../static/imgs/{{name[0].product_photo}}" alt="photo">
+    </div>
+    <div class="post_contain_text">
+        <p>Описание: <br>{{ name[0].descript|safe }}</p>
+        <h3><b>Цена: {{ name[0].price }}тг</b></h3>
+    </div>
+</div>
+
+
 
 {% endblock %}

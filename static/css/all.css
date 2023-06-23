@@ -126,3 +126,35 @@
     width: 50%;
     margin-bottom: 5%;
 }
+
+
+/* Карточка поста */
+
+.post_contain {
+    padding: 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.post_contain p,
+.post_contain h1,
+.post_contain h3 {
+    margin: 30px 0;
+}
+
+.post_contain_photo>img {
+    width: 50vh;
+    border: 1px solid #6f6f6f;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.post_contain_text {
+    width: 50%;
+}
+
+.post_contain_text p {
+    font-size: 20px;
+}
