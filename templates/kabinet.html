@@ -11,12 +11,19 @@
             <p>Изменить фото профиля</p>
             <p><input type="file" name="file"></p>
             <p><input type="submit" value="Загрузить"></p>
+            {% for kat, msg in get_flashed_messages(True) %}
+                <div class="flash_message {{kat}}">
+                    {{ msg }}
+                </div>
+            {% endfor %}
         </form>
+        <!-- Вывод быстрых сообщений -->
+
     </div>
     <div>
-        <p>ID: {{user_id}}</p>
-        <p>Привет {{ current_user.get_name() }} !</p>
-        <p>Номер: {{ current_user.get_phone() }}</p>
+        <p>{{ user_id[0].id }}</p>
+        <p>{{ current_user.get_name() }}</p>
+        <p>{{ current_user.get_phone() }}</p>
         <a href="/logout">Выйти</a>
     </div>
 </div>

@@ -4,7 +4,8 @@ from FDataBase import FDataBase
 from werkzeug.security import generate_password_hash , check_password_hash
 from flask_login import LoginManager , login_user , login_required ,logout_user , current_user
 from UserLogin import UserLogin
-# from flask_sqlalchemy import SQLAlchemy
+from app_file import db as sql_db
+import app_file
 
 app = fl.Flask(__name__)
 app.config["SECRET_KEY"] = "ASGKASJFQ3323AKFSFK32FKAF"
@@ -14,25 +15,14 @@ login_manager.login_message = "Авторизуйтесь для доступа 
 login_manager.login_message_category = "success"
 login_manager.login_view = 'login'
 
-# db = SQLAlchemy(app)
-#
-# class Users(db.model):
-#     id = db.Column(db.Integer , primary_key = True)
-#     login = db.Column(db.String(50) , unique = True)
-#     password = db.Column(db.integer(500),nullable = True)
-#
-#     def __repr__(self):
-#         return f"<users {self.id}>"
-#
-# class
+
 
 # Функция для получения данных из БД
 dbase = None
 @app.before_request
 def DBase_connect():
     global dbase
-    db = get_db()
-    dbase = FDataBase(db)
+    dbase = FDataBase(sql_db)
 
 # Главная страница
 @app.route('/')
@@ -82,15 +72,21 @@ def load_user(user_id):
 def registration():
     user_in_base = True
     if fl.request.method == "POST":
-        for i in range(len(dbase.get_users())):
-            if fl.request.form['login'] == dbase.get_users()[i][0]:
-                print("Пользователь с таким логином уже есть !" , dbase.get_users()[i][0])
-                fl.flash("Пользователь с таким логином уже есть !",category='error')
-                user_in_base = False
-                break
+        if dbase.get_users(fl.request.form['login']):
+            print("Пользователь с таким логином уже есть ! ",fl.request.form['login'])
+            fl.flash("Пользователь с таким логином уже есть !",category='error')
+            user_in_base = False
+
+
+        # for i in range(len(dbase.get_users())):
+        #     if fl.request.form['login'] == dbase.get_users()[i][0]:
+        #         print("Пользователь с таким логином уже есть !" , dbase.get_users()[i][0])
+        #         fl.flash("Пользователь с таким логином уже есть !",category='error')
+        #         user_in_base = False
+        #         break
 
         if user_in_base:
-            if len(fl.request.form['psw']) < 9 or fl.request.form['psw'] != fl.request.form['rep_psw']:
+            if len(fl.request.form['psw']) <= 5 or fl.request.form['psw'] != fl.request.form['rep_psw']:
                 fl.flash("Пароль неверный",category='error')
             else:
                 # Шифрование пароля
@@ -112,7 +108,8 @@ def login():
 
     if fl.request.method == "POST":
         user = dbase.get_users_by_login(fl.request.form['login'])
-        if user and check_password_hash(user['password'], fl.request.form['pwd']):
+        if user and check_password_hash(user[0].password, fl.request.form['pwd']):
+            print("Line 1")
             userLogin = UserLogin().create(user)
             rm = True if fl.request.form.get('remainme') else False
             login_user(userLogin,remember=rm)
@@ -172,26 +169,27 @@ def admin():
 # Удаление поста через админ панель
 @app.route('/delete_post/<int:post_id>')
 def delete_post(post_id):
-    print(post_id)
-    res = dbase.delete_post(post_id)
+    print("post id: ",post_id)
+    # post_id = int(post_id)
+    res = delete_post(post_id)
     if res:
         fl.flash("Успешно !",category='success')
     else:
         fl.flash("Ошибка",category='error')
-    return fl.render_template('index.html',menu=dbase.get_menu(),title = "Главная")
+    return fl.render_template('admin_panel.html',menu=dbase.get_menu(),title = "Главная")
 
 # Удалить пользоваетя
 @app.route('/delete_user', methods = ["GET","POST"])
 def delete_user():
-    # ошибка - TypeError: delete_user() missing 1 required positional argument: 'self'
     user_id = fl.request.form.get('user_id')
-    print(id)
-    del_user = FDataBase.delete_user(user_id = user_id)
+    user_id = int(user_id)
+    del_user = dbase.delete_post(user_id)
+
     if not del_user:
         fl.flash("Ошибка добавления статьи",category = "error")
     else:
         fl.flash("Успешно! ",category = 'success')
-        return fl.redirect(fl.url_for('admin_panel'))
+        return fl.render_template('admin_panel.html')
     return fl.render_template('admin_panel.html',menu=dbase.get_menu(),title = "Админ панель")
 
 # Добавить пост
@@ -238,11 +236,11 @@ def upload():
         if file and current_user.verifyExt(file.filename):
             try:
                 img = file.read()
-                res = dbase.updateUserAvatar(img,current_user.get_id())
+                res = dbase.updateUserAvatar(img,current_user.get_id()[0].id)
                 if not res:
                     fl.flash("Ошибка обновления аватарки","error")
                     return fl.redirect(fl.url_for('kabinet'))
-                fl.flash("Аватар овновлен", "success")
+                fl.flash("Аватар обновлен", "success")
             except FileNotFoundError as e:
                 fl.flash("Ошибка чтения файла" , 'error')
         else:
@@ -270,3 +268,8 @@ def close_db(error):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+# Доделать delete - выводит успешно , но не срабатывает
+# В kabinet.html закоментил строки
+# ^ get_id не работает 

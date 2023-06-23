@@ -4,13 +4,13 @@
 
 {{ super() }}
 {% if user == "admin" %}
-    <a href="{{ url_for('delete_post',post_id = name.id) }}">Удалить пост</a>
+    <a href="{{ url_for('delete_post',post_id = name[0].id) }}">Удалить пост</a>
 {% endif %}
-<p>{{name.name}}</p>
-<img width="250" src="../static/imgs/{{name.product_photo}}" alt="photo">
+<p>{{name[0].name}}</p>
+<img width="250" src="../static/imgs/{{name[0].product_photo}}" alt="photo">
 <br>
-<p>{{ name.descript|safe }}</p>
+<p>{{ name[0].descript|safe }}</p>
 <br>
-<p>{{ name.price }}</p>
+<p>{{ name[0].price }}</p>
 
 {% endblock %}
